@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--标签约束  -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/util
+		http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd
+		 " >
+    <!--配置扫描器-->
+    <context:component-scan base-package="com.zjh"></context:component-scan>
+    <!--加载数据库属性文件-->
+    <util:properties id="db" location="classpath:db.properties"></util:properties>
+    <!--配置数据源-->
+    <bean id="jdbc" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="#{db.driverClassName}"></property>
+        <property name="username" value="#{db.userName}"></property>
+        <property name="url" value="#{db.url}"></property>
+        <property name="password" value="#{db.password}"></property>
+    </bean>
+    <!--配置mybatis的sqlsession工厂-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sessionFactory">
+        <property name="dataSource" ref="jdbc"/>
+        <!--mybatis配置文件的位置-->
+        <property name="configLocation" value="classpath:MyBatisConfig.xml"/>
+        <!--mapper文件的位置-->
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+    </bean>
+    <!--dao(mapper)接口的扫描配置-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--引用 mybatis的sqlsession工厂-->
+        <property name="sqlSessionFactory" ref="sessionFactory"/>
+        <!--扫描指定的包-->
+        <property name="basePackage" value="com.zjh.mapper"/>
+    </bean>
+
+    <!--配置视图解析器，可以在我们返回的视图上自动加上前后缀-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="WEB-INF/"></property>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--文件上传解析器-->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    </bean>
+
+
+</beans>
